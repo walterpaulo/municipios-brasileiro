@@ -77,7 +77,8 @@ function getEstadoSelectionado() {
     mostrarLoading()
     corpoTabelaMuncipio
     this.getMunicipioIBGE();
-  // } else {
+  }
+  //  else {
   //   alert("Escolhe um estado.")
   // }
 }
