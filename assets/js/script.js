@@ -7,6 +7,7 @@ var corpoTabelaMuncipio = document.getElementById("corpoTabelaMuncipio");
 var overlays = document.getElementById("overlays");
 var loading = document.getElementById("loading");
 var resultado = document.getElementById("resultado");
+var boxBuscaMunicipios = document.getElementById("box-busca-municipios");
 
 const itemsPerPage = 10; // número de itens por página
 var totalItems = 0; // número total de itens na lista
@@ -29,14 +30,20 @@ let completedRequests = 0;
 
 var rows = []
 
-
-btnBaixarExcel.disabled = true
-btnBaixarPDF.disabled = true
-resultado.setAttribute("class", "noShow");
+desabilitarBotoesDownload();
+desabilitarResultado();
 
 window.onload = () => {
   this.getEstados()
 };
+
+function errorMensagem(texto) {
+  const divMessagem = document.createElement('div');
+  divMessagem.classList.add('alert', 'alert-danger', 'mt-3')
+  divMessagem.setAttribute("role", "alert");
+  divMessagem.innerHTML = texto;
+  boxBuscaMunicipios.insertAdjacentElement('beforeend', divMessagem);
+}
 
 function getEstados() {
   fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados`)
@@ -46,7 +53,7 @@ function getEstados() {
         // id":52,"sigla":"GO","nome":"Goiás"
         const option = document.createElement('option');
         option.setAttribute('value', estado.id);
-        option.setAttribute('title',estado.nome)
+        option.setAttribute('title', estado.nome)
         option.innerHTML = estado.nome
         listaEstados.appendChild(option)
         estados.push({ id: estado.id, sigla: estado.sigla, nome: estado.nome })
@@ -108,7 +115,7 @@ function getMunicipioIBGE() {
         }
         listaMunicipios = response;
         if (listaEstados.options.length > 0 && listaEstados.options != null) {
-          resultado.removeAttribute("class", "noShow")
+          ativarResultado();
         }
         rows = []
         listaMunicipios.forEach(municipio => {
@@ -124,11 +131,34 @@ function getMunicipioIBGE() {
         renderPage(paginaCorrente);
         esconderLoading();
         paginacaoRodape();
-        btnBaixarExcel.disabled = false
-        btnBaixarPDF.disabled = false
+        ativarBotoesDownload();
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+        console.error(error);
+        esconderLoading();
+        desabilitarBotoesDownload();
+        desabilitarResultado();
+        errorMensagem("Ocorreu um erro. Tente novamente mais tarde.")
+      });
   }
+}
+
+function ativarBotoesDownload() {
+  btnBaixarExcel.disabled = false
+  btnBaixarPDF.disabled = false
+}
+
+function desabilitarBotoesDownload() {
+  btnBaixarExcel.disabled = true
+  btnBaixarPDF.disabled = true
+}
+
+function desabilitarResultado() {
+  resultado.setAttribute("class", "noShow");
+}
+
+function ativarResultado() {
+  resultado.removeAttribute("class", "noShow")
 }
 
 function paginacaoRodape() {
