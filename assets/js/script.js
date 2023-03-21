@@ -43,6 +43,10 @@ function errorMensagem(texto) {
   divMessagem.setAttribute("role", "alert");
   divMessagem.innerHTML = texto;
   boxBuscaMunicipios.insertAdjacentElement('beforeend', divMessagem);
+
+  setTimeout(function() {
+    divMessagem.remove();
+  }, 10000);
 }
 
 function getEstados() {
